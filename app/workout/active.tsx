@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { View, ScrollView, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
-import { SquareCheck, Square, Trash2, Plus, Play } from 'lucide-react-native';
+import { SquareCheck, Square, Trash2, Plus, Timer } from 'lucide-react-native';
 
 import { Text } from '../../components/ui/text';
 import { Button } from '../../components/ui/button';
@@ -18,9 +18,7 @@ export default function ActiveWorkoutScreen() {
   const isFocused = useIsFocused();
   const {
     isActive,
-    startedAt,
     exercises,
-    templateId,
     addExercise,
     removeExercise,
     addSet,
@@ -28,26 +26,54 @@ export default function ActiveWorkoutScreen() {
     toggleSetComplete,
     finishWorkout,
     discardWorkout,
-    startTimer,
   } = useWorkoutStore();
 
-  const [elapsed, setElapsed] = useState('00:00');
   const [pickerVisible, setPickerVisible] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Timer
+  // Rest countdown timer state
+  const [restEndTime, setRestEndTime] = useState<number | null>(null);
+  const [restDisplay, setRestDisplay] = useState('');
+  const [restDone, setRestDone] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Rest countdown effect
   useEffect(() => {
-    if (!startedAt) return;
-    const interval = setInterval(() => {
-      const ms = Date.now() - new Date(startedAt).getTime();
-      const mins = Math.floor(ms / 60000);
-      const secs = Math.floor((ms % 60000) / 1000);
-      setElapsed(
-        `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
-      );
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [startedAt]);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (!restEndTime) return;
+
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((restEndTime - Date.now()) / 1000));
+      const mins = Math.floor(remaining / 60);
+      const secs = remaining % 60;
+      setRestDisplay(`${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`);
+      if (remaining <= 0) {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        setRestEndTime(null);
+        setRestDone(true);
+      }
+    };
+
+    tick();
+    intervalRef.current = setInterval(tick, 200);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [restEndTime]);
+
+  const handleRestTimer = useCallback(() => {
+    // Clear any active countdown
+    setRestEndTime(null);
+    setRestDone(false);
+
+    Alert.alert('Rest Timer', 'Choose rest duration', [
+      { text: '0:30', onPress: () => setRestEndTime(Date.now() + 30 * 1000) },
+      { text: '1:00', onPress: () => setRestEndTime(Date.now() + 60 * 1000) },
+      { text: '1:30', onPress: () => setRestEndTime(Date.now() + 90 * 1000) },
+      { text: '2:00', onPress: () => setRestEndTime(Date.now() + 120 * 1000) },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  }, []);
 
   // If navigated here without an active workout, go back
   useEffect(() => {
@@ -127,18 +153,18 @@ export default function ActiveWorkoutScreen() {
           <Text className="text-base font-semibold text-destructive">Discard</Text>
         </Pressable>
 
-        {startedAt ? (
-          <Text className="text-lg font-bold text-foreground">{elapsed}</Text>
-        ) : (
-          <Pressable
-            onPress={startTimer}
-            className="flex-row items-center gap-1.5"
-            hitSlop={8}
-          >
-            <Play size={14} color="#22c55e" fill="#22c55e" />
-            <Text className="text-lg font-bold text-green-500">Start</Text>
-          </Pressable>
-        )}
+        <Pressable onPress={handleRestTimer} className="flex-row items-center gap-1.5" hitSlop={8}>
+          {restEndTime ? (
+            <Text className="text-lg font-bold text-primary">{restDisplay}</Text>
+          ) : restDone ? (
+            <Text className="text-lg font-bold text-green-500">Done!</Text>
+          ) : (
+            <>
+              <Timer size={16} color="#6b7280" />
+              <Text className="text-lg font-bold text-muted-foreground">Rest</Text>
+            </>
+          )}
+        </Pressable>
 
         <Pressable onPress={handleFinish} hitSlop={8} disabled={saving}>
           <Text className="text-base font-semibold text-primary">
