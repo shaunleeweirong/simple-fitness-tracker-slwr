@@ -155,7 +155,7 @@ export default function StatsScreen() {
               backgroundGradientTo: '#1E1E1E',
               color: (opacity = 1) => `rgba(14,165,233,${opacity})`,
               labelColor: (opacity = 1) => `rgba(163,163,163,${opacity})`,
-              decimalCount: 0,
+              decimalPlaces: 0,
               propsForDots: {
                 r: '4',
                 strokeWidth: '2',
