@@ -30,6 +30,16 @@ export default function RootLayout() {
       <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="template/create"
+          options={{
+            headerShown: true,
+            title: 'Create Template',
+            headerStyle: { backgroundColor: '#121212' },
+            headerTintColor: '#f2f2f2',
+            presentation: 'modal',
+          }}
+        />
       </Stack>
     </>
   );
