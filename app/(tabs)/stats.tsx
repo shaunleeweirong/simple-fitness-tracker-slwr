@@ -6,6 +6,7 @@ import { Trophy, TrendingUp, Target } from 'lucide-react-native';
 
 import { Text } from '../../components/ui/text';
 import { Card, CardContent } from '../../components/ui/card';
+import { WorkoutCalendar } from '../../components/calendar/WorkoutCalendar';
 import {
   getPersonalRecords,
   getMonthlyStats,
@@ -106,6 +107,9 @@ export default function StatsScreen() {
 
   return (
     <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 16 }}>
+      {/* Workout Calendar */}
+      <WorkoutCalendar />
+
       {/* Monthly Summary Cards */}
       <View className="flex-row gap-3 mb-6">
         <Card className="flex-1">

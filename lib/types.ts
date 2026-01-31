@@ -67,3 +67,12 @@ export interface PersonalRecord {
   max_volume_reps: number;
   achieved_at: string;
 }
+
+export interface CalendarDay {
+  day: number;
+  date: string;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  hasWorkout: boolean;
+  workoutId: number | null;
+}

@@ -209,6 +209,35 @@ export async function getExerciseVolumeHistory(exerciseId: number, days = 90) {
   );
 }
 
+export async function getWorkoutDaysForMonth(
+  year: number,
+  month: number
+): Promise<{ date: string; workout_id: number }[]> {
+  const db = await getDatabase();
+  const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+  const endDate =
+    month === 11
+      ? `${year + 1}-01-01`
+      : `${year}-${String(month + 2).padStart(2, '0')}-01`;
+  return db.getAllAsync<{ date: string; workout_id: number }>(
+    `SELECT DATE(started_at) as date, MIN(id) as workout_id
+     FROM workout_logs
+     WHERE started_at >= ? AND started_at < ?
+     GROUP BY DATE(started_at)
+     ORDER BY date`,
+    [startDate, endDate]
+  );
+}
+
+export async function getAllWorkoutDates(): Promise<{ date: string }[]> {
+  const db = await getDatabase();
+  return db.getAllAsync<{ date: string }>(
+    `SELECT DISTINCT DATE(started_at) as date
+     FROM workout_logs
+     ORDER BY date DESC`
+  );
+}
+
 export async function getMonthlyStats() {
   const db = await getDatabase();
   return db.getFirstAsync<{
