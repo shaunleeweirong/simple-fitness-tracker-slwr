@@ -94,9 +94,11 @@ export default function LogScreen() {
   const { isActive, startWorkout } = useWorkoutStore();
   const [recentWorkouts, setRecentWorkouts] = useState<WorkoutSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [navigating, setNavigating] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
+      setNavigating(false);
       let cancelled = false;
 
       async function load() {
@@ -120,6 +122,7 @@ export default function LogScreen() {
   );
 
   function handleStartFreeform() {
+    setNavigating(true);
     startWorkout(null);
     router.push('/workout/active');
   }
@@ -146,7 +149,7 @@ export default function LogScreen() {
             </Text>
 
             {/* Action Buttons */}
-            {isActive ? (
+            {isActive && !navigating ? (
               <Button
                 className="mb-3 bg-green-600"
                 onPress={handleResume}

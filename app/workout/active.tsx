@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
 import { SquareCheck, Square, Trash2, Plus } from 'lucide-react-native';
 
 import { Text } from '../../components/ui/text';
@@ -14,6 +15,7 @@ import type { Exercise } from '../../lib/types';
 
 export default function ActiveWorkoutScreen() {
   const router = useRouter();
+  const isFocused = useIsFocused();
   const {
     isActive,
     startedAt,
@@ -48,10 +50,10 @@ export default function ActiveWorkoutScreen() {
 
   // If navigated here without an active workout, go back
   useEffect(() => {
-    if (!isActive && !saving) {
+    if (isFocused && !isActive && !saving) {
       router.back();
     }
-  }, [isActive, saving]);
+  }, [isFocused, isActive, saving]);
 
   function handleDiscard() {
     Alert.alert(
