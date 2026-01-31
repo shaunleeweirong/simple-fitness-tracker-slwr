@@ -38,6 +38,7 @@ export async function initializeDatabase(): Promise<void> {
     CREATE TABLE IF NOT EXISTS workout_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       template_id INTEGER REFERENCES templates(id) ON DELETE SET NULL,
+      name TEXT,
       started_at TEXT NOT NULL,
       finished_at TEXT NOT NULL
     );
@@ -51,4 +52,12 @@ export async function initializeDatabase(): Promise<void> {
       reps INTEGER NOT NULL
     );
   `);
+
+  // Migration: add name column to workout_logs if it doesn't exist
+  const columns = await database.getAllAsync<{ name: string }>(
+    `PRAGMA table_info(workout_logs)`
+  );
+  if (!columns.some((c) => c.name === 'name')) {
+    await database.execAsync(`ALTER TABLE workout_logs ADD COLUMN name TEXT`);
+  }
 }

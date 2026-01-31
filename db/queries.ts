@@ -110,7 +110,7 @@ export async function getWorkoutHistory(limit = 50): Promise<WorkoutSummary[]> {
   return db.getAllAsync<WorkoutSummary>(
     `SELECT
        wl.id,
-       t.name as template_name,
+       COALESCE(wl.name, t.name) as template_name,
        wl.started_at,
        wl.finished_at,
        COUNT(DISTINCT ws.exercise_id) as exercise_count,
@@ -128,7 +128,7 @@ export async function getWorkoutHistory(limit = 50): Promise<WorkoutSummary[]> {
 export async function getWorkoutDetail(workoutId: number) {
   const db = await getDatabase();
   const log = await db.getFirstAsync<WorkoutLog & { template_name: string | null }>(
-    `SELECT wl.*, t.name as template_name
+    `SELECT wl.*, COALESCE(wl.name, t.name) as template_name
      FROM workout_logs wl
      LEFT JOIN templates t ON wl.template_id = t.id
      WHERE wl.id = ?`,
@@ -148,6 +148,14 @@ export async function getWorkoutDetail(workoutId: number) {
 export async function deleteWorkout(workoutId: number): Promise<void> {
   const db = await getDatabase();
   await db.runAsync('DELETE FROM workout_logs WHERE id = ?', [workoutId]);
+}
+
+export async function updateWorkoutName(
+  workoutLogId: number,
+  name: string | null
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync('UPDATE workout_logs SET name = ? WHERE id = ?', [name, workoutLogId]);
 }
 
 export async function updateWorkoutSets(

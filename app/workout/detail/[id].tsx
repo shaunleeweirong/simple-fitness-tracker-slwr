@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Input } from '../../../components/ui/input';
 import { Button } from '../../../components/ui/button';
 import { Pencil, Trash2, Plus, X, Check, Minus } from 'lucide-react-native';
-import { getWorkoutDetail, deleteWorkout, updateWorkoutSets } from '../../../db/queries';
+import { getWorkoutDetail, deleteWorkout, updateWorkoutSets, updateWorkoutName } from '../../../db/queries';
 import type { WorkoutLog, WorkoutSet } from '../../../lib/types';
 
 type WorkoutLogRow = WorkoutLog & { template_name: string | null };
@@ -56,9 +56,9 @@ function formatDuration(startedAt: string, finishedAt: string): string {
 
 function formatVolume(volume: number): string {
   if (volume >= 1000) {
-    return `${(volume / 1000).toFixed(1).replace(/\.0$/, '')}k lbs`;
+    return `${(volume / 1000).toFixed(1).replace(/\.0$/, '')}k kg`;
   }
-  return `${volume} lbs`;
+  return `${volume} kg`;
 }
 
 function groupSetsByExercise(sets: SetRow[]): ExerciseGroup[] {
@@ -110,6 +110,7 @@ export default function WorkoutDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [editSets, setEditSets] = useState<EditableSet[]>([]);
+  const [editName, setEditName] = useState('');
 
   const fetchDetail = useCallback(async () => {
     if (!id) return;
@@ -124,6 +125,7 @@ export default function WorkoutDetailScreen() {
   }, [fetchDetail]);
 
   const enterEditMode = () => {
+    setEditName(log?.template_name ?? 'Freeform Workout');
     setEditSets(
       sets.map((s) => ({
         exercise_id: s.exercise_id,
@@ -139,6 +141,7 @@ export default function WorkoutDetailScreen() {
 
   const cancelEdit = () => {
     setEditSets([]);
+    setEditName('');
     setEditing(false);
   };
 
@@ -191,10 +194,8 @@ export default function WorkoutDetailScreen() {
       return !isNaN(w) && w > 0 && !isNaN(r) && r > 0;
     });
 
-    if (validSets.length === 0) {
-      Alert.alert('No Valid Sets', 'Add at least one set with valid weight and reps.');
-      return;
-    }
+    const trimmedName = editName.trim();
+    await updateWorkoutName(log.id, trimmedName || null);
 
     await updateWorkoutSets(
       log.id,
@@ -208,6 +209,7 @@ export default function WorkoutDetailScreen() {
 
     setEditing(false);
     setEditSets([]);
+    setEditName('');
     await fetchDetail();
   };
 
@@ -288,11 +290,9 @@ export default function WorkoutDetailScreen() {
                 </>
               ) : (
                 <>
-                  {sets.length > 0 && (
-                    <Pressable onPress={enterEditMode} hitSlop={8}>
-                      <Pencil size={20} color="#f2f2f2" />
-                    </Pressable>
-                  )}
+                  <Pressable onPress={enterEditMode} hitSlop={8}>
+                    <Pencil size={20} color="#f2f2f2" />
+                  </Pressable>
                   <Pressable onPress={handleDelete} hitSlop={8}>
                     <Trash2 size={20} color="#ef4444" />
                   </Pressable>
@@ -305,9 +305,18 @@ export default function WorkoutDetailScreen() {
       <ScrollView className="flex-1 bg-background px-4 pt-4" showsVerticalScrollIndicator={false}>
         {/* Summary header */}
         <View className="mb-6">
-          <Text className="text-2xl font-bold text-foreground mb-1">
-            {workoutName}
-          </Text>
+          {editing ? (
+            <Input
+              className="text-2xl font-bold mb-1"
+              value={editName}
+              onChangeText={setEditName}
+              placeholder="Workout name"
+            />
+          ) : (
+            <Text className="text-2xl font-bold text-foreground mb-1">
+              {workoutName}
+            </Text>
+          )}
           <Text className="text-sm text-muted-foreground mb-2">{fullDate}</Text>
           <View className="flex-row items-center gap-6">
             <View>
@@ -341,7 +350,7 @@ export default function WorkoutDetailScreen() {
                 {group.sets.map((set) => (
                   <View key={set.id} className="flex-row py-1.5">
                     <Text className="flex-1 text-sm text-foreground">{set.set_number}</Text>
-                    <Text className="flex-1 text-sm text-foreground text-center">{set.weight} lbs</Text>
+                    <Text className="flex-1 text-sm text-foreground text-center">{set.weight} kg</Text>
                     <Text className="flex-1 text-sm text-foreground text-right">{set.reps}</Text>
                   </View>
                 ))}

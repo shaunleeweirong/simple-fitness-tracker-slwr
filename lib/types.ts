@@ -21,6 +21,7 @@ export interface TemplateExercise {
 export interface WorkoutLog {
   id: number;
   template_id: number | null;
+  name: string | null;
   started_at: string;
   finished_at: string;
 }

@@ -8,6 +8,7 @@ interface WorkoutState {
   exercises: ActiveExercise[];
 
   startWorkout: (templateId?: number | null) => void;
+  startTimer: () => void;
   addExercise: (exerciseId: number, exerciseName: string, targetSets?: number, targetReps?: number) => void;
   removeExercise: (exerciseId: number) => void;
   addSet: (exerciseId: number) => void;
@@ -37,9 +38,15 @@ export const useWorkoutStore = create<WorkoutState>()((set, get) => ({
     set({
       isActive: true,
       templateId,
-      startedAt: new Date().toISOString(),
+      startedAt: null,
       exercises: [],
     });
+  },
+
+  startTimer: () => {
+    if (!get().startedAt) {
+      set({ startedAt: new Date().toISOString() });
+    }
   },
 
   addExercise: (exerciseId, exerciseName, targetSets = 1, targetReps = 0) => {
@@ -119,7 +126,7 @@ export const useWorkoutStore = create<WorkoutState>()((set, get) => ({
   finishWorkout: () => {
     const { templateId, startedAt, exercises } = get();
     set({ isActive: false, templateId: null, startedAt: null, exercises: [] });
-    return { templateId: templateId!, startedAt: startedAt!, exercises };
+    return { templateId: templateId!, startedAt: startedAt ?? new Date().toISOString(), exercises };
   },
 
   discardWorkout: () => {

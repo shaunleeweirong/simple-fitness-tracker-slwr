@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useIsFocused } from '@react-navigation/native';
-import { SquareCheck, Square, Trash2, Plus } from 'lucide-react-native';
+import { SquareCheck, Square, Trash2, Plus, Play } from 'lucide-react-native';
 
 import { Text } from '../../components/ui/text';
 import { Button } from '../../components/ui/button';
@@ -28,6 +28,7 @@ export default function ActiveWorkoutScreen() {
     toggleSetComplete,
     finishWorkout,
     discardWorkout,
+    startTimer,
   } = useWorkoutStore();
 
   const [elapsed, setElapsed] = useState('00:00');
@@ -126,7 +127,18 @@ export default function ActiveWorkoutScreen() {
           <Text className="text-base font-semibold text-destructive">Discard</Text>
         </Pressable>
 
-        <Text className="text-lg font-bold text-foreground">{elapsed}</Text>
+        {startedAt ? (
+          <Text className="text-lg font-bold text-foreground">{elapsed}</Text>
+        ) : (
+          <Pressable
+            onPress={startTimer}
+            className="flex-row items-center gap-1.5"
+            hitSlop={8}
+          >
+            <Play size={14} color="#22c55e" fill="#22c55e" />
+            <Text className="text-lg font-bold text-green-500">Start</Text>
+          </Pressable>
+        )}
 
         <Pressable onPress={handleFinish} hitSlop={8} disabled={saving}>
           <Text className="text-base font-semibold text-primary">
@@ -164,7 +176,7 @@ export default function ActiveWorkoutScreen() {
                   SET
                 </Text>
                 <Text className="text-xs font-semibold uppercase text-muted-foreground flex-1 text-center">
-                  WEIGHT (lb)
+                  WEIGHT (kg)
                 </Text>
                 <Text className="text-xs font-semibold uppercase text-muted-foreground flex-1 text-center">
                   REPS

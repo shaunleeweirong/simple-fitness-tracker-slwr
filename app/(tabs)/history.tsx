@@ -29,9 +29,9 @@ function formatDuration(startedAt: string, finishedAt: string): string {
 
 function formatVolume(volume: number): string {
   if (volume >= 1000) {
-    return `${(volume / 1000).toFixed(1).replace(/\.0$/, '')}k lbs`;
+    return `${(volume / 1000).toFixed(1).replace(/\.0$/, '')}k kg`;
   }
-  return `${volume} lbs`;
+  return `${volume} kg`;
 }
 
 export default function HistoryScreen() {

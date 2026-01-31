@@ -124,7 +124,7 @@ export default function StatsScreen() {
             <Text className="text-2xl font-bold text-foreground mt-2">
               {formatVolume(monthlyStats?.total_volume ?? 0)}
             </Text>
-            <Text className="text-xs text-muted-foreground mt-1">Volume (lb)</Text>
+            <Text className="text-xs text-muted-foreground mt-1">Volume (kg)</Text>
           </CardContent>
         </Card>
 
@@ -184,7 +184,7 @@ export default function StatsScreen() {
                   {pr.exercise_name}
                 </Text>
                 <Text className="text-sm text-muted-foreground mt-1">
-                  Best: {pr.max_weight} lb x {pr.max_weight_reps} reps
+                  Best: {pr.max_weight} kg x {pr.max_weight_reps} reps
                 </Text>
               </CardContent>
             </Card>
