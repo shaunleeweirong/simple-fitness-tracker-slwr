@@ -145,6 +145,25 @@ export async function getWorkoutDetail(workoutId: number) {
   return { log, sets };
 }
 
+export async function deleteWorkout(workoutId: number): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync('DELETE FROM workout_logs WHERE id = ?', [workoutId]);
+}
+
+export async function updateWorkoutSets(
+  workoutLogId: number,
+  sets: { exercise_id: number; set_number: number; weight: number; reps: number }[]
+): Promise<void> {
+  const db = await getDatabase();
+  await db.runAsync('DELETE FROM workout_sets WHERE workout_log_id = ?', [workoutLogId]);
+  for (const s of sets) {
+    await db.runAsync(
+      'INSERT INTO workout_sets (workout_log_id, exercise_id, set_number, weight, reps) VALUES (?, ?, ?, ?, ?)',
+      [workoutLogId, s.exercise_id, s.set_number, s.weight, s.reps]
+    );
+  }
+}
+
 // ─── Stats ───
 
 export async function getPersonalRecords(): Promise<PersonalRecord[]> {
