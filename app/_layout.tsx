@@ -31,13 +31,34 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
+          name="workout/active"
+          options={{ headerShown: false, presentation: 'fullScreenModal' }}
+        />
+        <Stack.Screen
+          name="workout/pick-template"
+          options={{
+            headerShown: true,
+            title: 'Pick Template',
+            headerStyle: { backgroundColor: '#121212' },
+            headerTintColor: '#f2f2f2',
+          }}
+        />
+        <Stack.Screen
+          name="workout/detail/[id]"
+          options={{
+            headerShown: true,
+            title: 'Workout Detail',
+            headerStyle: { backgroundColor: '#121212' },
+            headerTintColor: '#f2f2f2',
+          }}
+        />
+        <Stack.Screen
           name="template/create"
           options={{
             headerShown: true,
-            title: 'Create Template',
+            title: 'New Template',
             headerStyle: { backgroundColor: '#121212' },
             headerTintColor: '#f2f2f2',
-            presentation: 'modal',
           }}
         />
       </Stack>
