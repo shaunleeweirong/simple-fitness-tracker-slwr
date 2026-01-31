@@ -51,7 +51,11 @@ export default function ActiveWorkoutScreen() {
   // If navigated here without an active workout, go back
   useEffect(() => {
     if (isFocused && !isActive && !saving) {
-      router.back();
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace('/');
+      }
     }
   }, [isFocused, isActive, saving]);
 
@@ -66,7 +70,6 @@ export default function ActiveWorkoutScreen() {
           style: 'destructive',
           onPress: () => {
             discardWorkout();
-            router.back();
           },
         },
       ]
@@ -102,7 +105,7 @@ export default function ActiveWorkoutScreen() {
       }
 
       await saveWorkout(result.templateId, result.startedAt, finishedAt, sets);
-      router.back();
+      setSaving(false);
     } catch (err) {
       console.error('Failed to save workout', err);
       Alert.alert('Error', 'Failed to save workout. Please try again.');
