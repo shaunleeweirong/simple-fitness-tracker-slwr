@@ -31,16 +31,6 @@ function formatRelativeDate(isoString: string): string {
   });
 }
 
-function formatDuration(startedAt: string, finishedAt: string): string {
-  const start = new Date(startedAt).getTime();
-  const end = new Date(finishedAt).getTime();
-  const mins = Math.round((end - start) / 60000);
-  if (mins < 60) return `${mins}m`;
-  const hrs = Math.floor(mins / 60);
-  const remainder = mins % 60;
-  return remainder > 0 ? `${hrs}h ${remainder}m` : `${hrs}h`;
-}
-
 function formatVolume(volume: number): string {
   if (volume >= 1000) {
     return `${(volume / 1000).toFixed(1).replace(/\.0$/, '')}k kg`;
@@ -71,9 +61,6 @@ function WorkoutCard({
               </Text>
               <Text className="text-sm text-muted-foreground">
                 {workout.exercise_count} exercise{workout.exercise_count !== 1 ? 's' : ''}
-              </Text>
-              <Text className="text-sm text-muted-foreground">
-                {formatDuration(workout.started_at, workout.finished_at)}
               </Text>
             </View>
             <Text className="text-sm text-primary mt-1">

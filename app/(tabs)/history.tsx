@@ -16,17 +16,6 @@ function formatDate(isoString: string): string {
   return `${weekday}, ${month} ${day}`;
 }
 
-function formatDuration(startedAt: string, finishedAt: string): string {
-  const start = new Date(startedAt).getTime();
-  const end = new Date(finishedAt).getTime();
-  const diffMs = end - start;
-  const minutes = Math.floor(diffMs / 60000);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return `${hours}h ${mins}m`;
-}
-
 function formatVolume(volume: number): string {
   if (volume >= 1000) {
     return `${(volume / 1000).toFixed(1).replace(/\.0$/, '')}k kg`;
@@ -59,7 +48,6 @@ export default function HistoryScreen() {
   const renderItem = ({ item }: { item: WorkoutSummary }) => {
     const label = item.template_name ?? 'Freeform';
     const date = formatDate(item.started_at);
-    const duration = formatDuration(item.started_at, item.finished_at);
     const volume = formatVolume(item.total_volume);
 
     return (
@@ -78,9 +66,6 @@ export default function HistoryScreen() {
             <View className="flex-row items-center gap-4 mt-1">
               <Text className="text-sm text-muted-foreground">
                 {item.exercise_count} exercise{item.exercise_count !== 1 ? 's' : ''}
-              </Text>
-              <Text className="text-sm text-muted-foreground">
-                {duration}
               </Text>
               <Text className="text-sm text-primary font-medium">
                 {volume}

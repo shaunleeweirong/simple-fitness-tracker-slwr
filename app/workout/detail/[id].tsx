@@ -43,17 +43,6 @@ function formatFullDate(isoString: string): string {
   });
 }
 
-function formatDuration(startedAt: string, finishedAt: string): string {
-  const start = new Date(startedAt).getTime();
-  const end = new Date(finishedAt).getTime();
-  const diffMs = end - start;
-  const minutes = Math.floor(diffMs / 60000);
-  if (minutes < 60) return `${minutes} min`;
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-}
-
 function formatVolume(volume: number): string {
   if (volume >= 1000) {
     return `${(volume / 1000).toFixed(1).replace(/\.0$/, '')}k kg`;
@@ -252,7 +241,6 @@ export default function WorkoutDetailScreen() {
 
   const workoutName = log.template_name ?? 'Freeform Workout';
   const fullDate = formatFullDate(log.started_at);
-  const duration = formatDuration(log.started_at, log.finished_at);
   const totalVolume = sets.reduce((sum, s) => sum + s.weight * s.reps, 0);
   const exerciseGroups = groupSetsByExercise(sets);
   const editGroups = editing ? groupEditSetsByExercise(editSets) : [];
@@ -319,10 +307,6 @@ export default function WorkoutDetailScreen() {
           )}
           <Text className="text-sm text-muted-foreground mb-2">{fullDate}</Text>
           <View className="flex-row items-center gap-6">
-            <View>
-              <Text className="text-xs text-muted-foreground uppercase">Duration</Text>
-              <Text className="text-base font-semibold text-foreground">{duration}</Text>
-            </View>
             <View>
               <Text className="text-xs text-muted-foreground uppercase">Volume</Text>
               <Text className="text-base font-semibold text-primary">{formatVolume(totalVolume)}</Text>
