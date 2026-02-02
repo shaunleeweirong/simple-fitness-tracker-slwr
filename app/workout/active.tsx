@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Input } from '../../components/ui/input';
 import { ExercisePicker } from '../../components/exercise-picker';
 import { useWorkoutStore } from '../../stores/workout-store';
-import { saveWorkout } from '../../db/queries';
+import { saveWorkout, getLastPerformance } from '../../db/queries';
 import type { Exercise } from '../../lib/types';
 
 export default function ActiveWorkoutScreen() {
@@ -140,8 +140,9 @@ export default function ActiveWorkoutScreen() {
     }
   }
 
-  function handleSelectExercise(exercise: Exercise) {
-    addExercise(exercise.id, exercise.name);
+  async function handleSelectExercise(exercise: Exercise) {
+    const previousSets = await getLastPerformance(exercise.id);
+    addExercise(exercise.id, exercise.name, undefined, undefined, previousSets);
     setPickerVisible(false);
   }
 
@@ -201,6 +202,11 @@ export default function ActiveWorkoutScreen() {
                 <Text className="text-xs font-semibold uppercase text-muted-foreground w-10">
                   SET
                 </Text>
+                {exercise.previousSets && exercise.previousSets.length > 0 && (
+                  <Text className="text-xs font-semibold uppercase text-muted-foreground w-20 text-center">
+                    PREV
+                  </Text>
+                )}
                 <Text className="text-xs font-semibold uppercase text-muted-foreground flex-1 text-center">
                   WEIGHT (kg)
                 </Text>
@@ -223,6 +229,14 @@ export default function ActiveWorkoutScreen() {
                   <Text className="text-sm font-medium text-muted-foreground w-10 text-center">
                     {index + 1}
                   </Text>
+
+                  {exercise.previousSets && exercise.previousSets.length > 0 && (
+                    <Text className="text-xs text-muted-foreground w-20 text-center">
+                      {exercise.previousSets[index]
+                        ? `${exercise.previousSets[index].weight}×${exercise.previousSets[index].reps}`
+                        : '-'}
+                    </Text>
+                  )}
 
                   <View className="flex-1 px-1">
                     <Input

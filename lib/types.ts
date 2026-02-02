@@ -35,10 +35,17 @@ export interface WorkoutSet {
   reps: number;
 }
 
+export interface PreviousSet {
+  set_number: number;
+  weight: number;
+  reps: number;
+}
+
 export interface ActiveExercise {
   exercise_id: number;
   exercise_name: string;
   sets: ActiveSet[];
+  previousSets?: PreviousSet[];
 }
 
 export interface ActiveSet {

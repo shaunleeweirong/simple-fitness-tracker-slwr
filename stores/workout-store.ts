@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ActiveExercise, ActiveSet } from '../lib/types';
+import type { ActiveExercise, ActiveSet, PreviousSet } from '../lib/types';
 
 interface WorkoutState {
   isActive: boolean;
@@ -8,7 +8,7 @@ interface WorkoutState {
   exercises: ActiveExercise[];
 
   startWorkout: (templateId?: number | null) => void;
-  addExercise: (exerciseId: number, exerciseName: string, targetSets?: number, targetReps?: number) => void;
+  addExercise: (exerciseId: number, exerciseName: string, targetSets?: number, targetReps?: number, previousSets?: PreviousSet[]) => void;
   removeExercise: (exerciseId: number) => void;
   addSet: (exerciseId: number) => void;
   removeSet: (exerciseId: number, setId: string) => void;
@@ -42,7 +42,7 @@ export const useWorkoutStore = create<WorkoutState>()((set, get) => ({
     });
   },
 
-  addExercise: (exerciseId, exerciseName, targetSets = 1, targetReps = 0) => {
+  addExercise: (exerciseId, exerciseName, targetSets = 1, targetReps = 0, previousSets?) => {
     const sets: ActiveSet[] = [];
     for (let i = 0; i < targetSets; i++) {
       sets.push({
@@ -55,7 +55,7 @@ export const useWorkoutStore = create<WorkoutState>()((set, get) => ({
     set((state) => ({
       exercises: [
         ...state.exercises,
-        { exercise_id: exerciseId, exercise_name: exerciseName, sets },
+        { exercise_id: exerciseId, exercise_name: exerciseName, sets, previousSets },
       ],
     }));
   },

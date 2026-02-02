@@ -7,6 +7,7 @@ import type {
   WorkoutSet,
   WorkoutSummary,
   PersonalRecord,
+  PreviousSet,
 } from '../lib/types';
 
 // ─── Exercises ───
@@ -31,6 +32,25 @@ export async function addExercise(name: string, muscleGroup: string | null): Pro
     [name, muscleGroup]
   );
   return result.lastInsertRowId;
+}
+
+export async function getLastPerformance(exerciseId: number): Promise<PreviousSet[]> {
+  const db = await getDatabase();
+  return db.getAllAsync<PreviousSet>(
+    `SELECT ws.set_number, ws.weight, ws.reps
+     FROM workout_sets ws
+     JOIN workout_logs wl ON ws.workout_log_id = wl.id
+     WHERE ws.exercise_id = ?
+       AND wl.id = (
+         SELECT wl2.id FROM workout_logs wl2
+         JOIN workout_sets ws2 ON ws2.workout_log_id = wl2.id
+         WHERE ws2.exercise_id = ?
+         ORDER BY wl2.started_at DESC
+         LIMIT 1
+       )
+     ORDER BY ws.set_number`,
+    [exerciseId, exerciseId]
+  );
 }
 
 // ─── Templates ───
