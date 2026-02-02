@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "simple-fitness-tracker",
+    "name": "Simple Fitness Tracker",
     "slug": "simple-fitness-tracker",
     "scheme": "simple-fitness-tracker",
     "version": "1.0.0",
@@ -14,7 +14,12 @@
       "backgroundColor": "#121212"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.digitalee.fitnesstracker",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -30,6 +35,12 @@
     "plugins": [
       "expo-router",
       "expo-sqlite"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f315ba30-4246-446a-b670-2a9e6d4c0014"
+      }
+    }
   }
 }
